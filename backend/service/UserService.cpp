@@ -6,3 +6,17 @@ bool UserService::registerUser(const User& user){
     }
     return userDAO.insertUser(user);
 }
+bool UserService::loginUser(
+    const std::string& username,
+    const std::string& password
+){
+    return userDAO.checkLogin(username,password);
+}
+bool UserService::getUserById(int id, User& user)
+{
+    return userDAO.getUserById(id, user);
+}
+bool UserService::updateUser(const User& user)
+{
+    return userDAO.updateUser(user);
+}
