@@ -221,6 +221,9 @@ bool UserDAO::updateUser(const User& user)
 
     if (conn == nullptr)
     {
+        std::cout << "UPDATE: database connection failed"
+                  << std::endl;
+
         return false;
     }
 
@@ -232,6 +235,10 @@ bool UserDAO::updateUser(const User& user)
         + "' WHERE id = "
         + std::to_string(user.id);
 
+    std::cout << "UPDATE SQL: "
+              << sql
+              << std::endl;
+
     if (mysql_query(conn, sql.c_str()) != 0)
     {
         std::cout << "UPDATE failed: "
@@ -242,10 +249,28 @@ bool UserDAO::updateUser(const User& user)
         return false;
     }
 
-    std::cout << "DAO: user update success"
+    std::cout << "UPDATE query executed successfully"
+              << std::endl;
+
+    my_ulonglong affectedRows =
+        mysql_affected_rows(conn);
+
+    std::cout << "UPDATE affected rows: "
+              << affectedRows
               << std::endl;
 
     mysql_close(conn);
+
+    if (affectedRows == 0)
+    {
+        std::cout << "UPDATE: no user was updated"
+                  << std::endl;
+
+        return false;
+    }
+
+    std::cout << "DAO: user update success"
+              << std::endl;
 
     return true;
 }

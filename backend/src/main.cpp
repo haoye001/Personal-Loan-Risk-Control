@@ -1,18 +1,15 @@
 #include <iostream>
 
 #include "../controller/UserController.h"
+#include <drogon/drogon.h>
 
 int main()
 {
-    UserController controller;
+    std::cout << "starting server" << std::endl;
 
-    User user;
-
-    user.id = 1;
-    user.username = "Jerry";
-    user.phone = "222222222";
-
-    controller.updateUser(user);
+    drogon::app()
+        .addListener("0.0.0.0", 8888)
+        .run();
 
     return 0;
 }
