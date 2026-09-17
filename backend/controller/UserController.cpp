@@ -146,7 +146,7 @@ void UserController::getUserHttp(
     std::function<void(const drogon::HttpResponsePtr&)>&& callback,
     int id)
 {
-        std::cout << "GET /api/users/{id} entered, id = "
+    std::cout << "GET /api/users/{id} entered, id = "
               << id << std::endl;
     User user;
 

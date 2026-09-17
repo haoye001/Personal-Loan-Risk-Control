@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "../controller/UserController.h"
+#include "../controller/LoanController.h"
+
 #include <drogon/drogon.h>
 
 int main()
