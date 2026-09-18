@@ -44,11 +44,12 @@ add_executable(
     dao/UserDAO.cpp
     controller/LoanController.cpp
     controller/LoanApplicationController.cpp
+    controller/RiskController.cpp
     service/LoanService.cpp
     dao/LoanDAO.cpp
     dao/LoanApplicationDAO.cpp
     service/LoanApplicationService.cpp
-
+    service/RiskService.cpp
 )
 
 # ==============================

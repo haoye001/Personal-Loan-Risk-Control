@@ -170,10 +170,14 @@ bool UserDAO::getUserById(int id, User& user)
     }
 
     std::string sql =
-        "SELECT id, username, password, phone "
-        "FROM user WHERE id = "
+        "SELECT id, username, password, phone, "
+        "age, income, job, debt "
+        "FROM `user` WHERE id = "
         + std::to_string(id);
-
+    std::cout
+    << "USER SQL: "
+    << sql
+    << std::endl;
     if (mysql_query(conn, sql.c_str()) != 0)
     {
         std::cout << "SELECT user failed: "
@@ -200,16 +204,25 @@ bool UserDAO::getUserById(int id, User& user)
 
     if (row == nullptr)
     {
+        std::cout
+        << "DAO: user not found"
+        << std::endl;
         mysql_free_result(result);
         mysql_close(conn);
         return false;
     }
-
+    std::cout
+    << "DAO: find user id="
+    << row[0]
+    << std::endl;
     user.id = std::stoi(row[0]);
     user.username = row[1];
     user.password = row[2];
     user.phone = row[3] ? row[3] : "";
-
+    user.age = row[4] ? std::stoi(row[4]) : 0;
+    user.income = row[5] ? std::stod(row[5]) : 0;
+    user.job = row[6] ? row[6] : "";
+    user.debt = row[7] ? std::stod(row[7]) : 0;
     mysql_free_result(result);
     mysql_close(conn);
 
