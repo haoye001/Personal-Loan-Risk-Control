@@ -6,45 +6,69 @@ void RiskController::checkRisk(
     )>&& callback
 )
 {
-    auto json=req->getJsonObject();
-    Json::Value result;
-    if(!json)
+    auto json = req->getJsonObject();
+    Json::Value responseJson;
+    if (!json)
     {
-        result["success"]=false;
-        result["message"]="invalid json";
+        responseJson["success"] = false;
+        responseJson["message"] = "invalid json";
         callback(
-            drogon::HttpResponse::newHttpJsonResponse(result)
+            drogon::HttpResponse::newHttpJsonResponse(
+                responseJson
+            )
         );
         return;
     }
-    int userId =
-        (*json)["userId"].asInt();
+    // 获取请求参数
+    int userId = (*json)["userId"].asInt();
+    int applicationId = (*json)["applicationId"].asInt();
     LoanApplication application;
-    application.userId=userId;
-    application.loanId =
-        (*json)["loanId"].asInt();
-    application.amount =
-        (*json)["amount"].asDouble();
+    application.id = applicationId;
+    application.userId = userId;
+    application.loanId = (*json)["loanId"].asInt();
+    application.amount = (*json)["amount"].asDouble();
+    // 查询用户
     User user;
-    if(!userDAO.getUserById(userId,user))
+    if (!userDAO.getUserById(userId, user))
     {
-        result["success"]=false;
-        result["message"]="user not found";
+        responseJson["success"] = false;
+        responseJson["message"] = "user not found";
         callback(
-            drogon::HttpResponse::newHttpJsonResponse(result)
+            drogon::HttpResponse::newHttpJsonResponse(
+                responseJson
+            )
         );
         return;
     }
-    RiskResult risk =
+    // 计算风险
+    RiskResult riskResult =
         riskService.calculateRisk(
             user,
             application
         );
-    result["success"]=true;
-    result["score"]=risk.score;
-    result["level"]=risk.level;
-    result["decision"]=risk.decision;
+    // 设置申请 ID
+    riskResult.applicationId = applicationId;
+    // 保存风险结果
+    if (!riskDAO.saveRiskResult(riskResult))
+    {
+        responseJson["success"] = false;
+        responseJson["message"] = "save risk result failed";
+        callback(
+            drogon::HttpResponse::newHttpJsonResponse(
+                responseJson
+            )
+        );
+        return;
+    }
+    // 返回结果
+    responseJson["success"] = true;
+    responseJson["applicationId"] = riskResult.applicationId;
+    responseJson["score"] = riskResult.score;
+    responseJson["level"] = riskResult.level;
+    responseJson["decision"] = riskResult.decision;
     callback(
-        drogon::HttpResponse::newHttpJsonResponse(result)
+        drogon::HttpResponse::newHttpJsonResponse(
+            responseJson
+        )
     );
 }

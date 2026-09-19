@@ -1,5 +1,4 @@
 #include "UserDAO.h"
-
 #include <iostream>
 #include <mysql.h>
 

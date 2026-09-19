@@ -2,12 +2,14 @@
 #include "../service/RiskService.h"
 #include "../dao/UserDAO.h"
 #include <drogon/drogon.h>
+#include "../dao/RiskDAO.h"
 class RiskController
     : public drogon::HttpController<RiskController>
 {
 private:
     RiskService riskService;
     UserDAO userDAO;
+    RiskDAO riskDAO;
 public:
 METHOD_LIST_BEGIN
 ADD_METHOD_TO(

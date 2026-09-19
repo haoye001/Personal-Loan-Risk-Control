@@ -47,6 +47,7 @@ add_executable(
     controller/RiskController.cpp
     service/LoanService.cpp
     dao/LoanDAO.cpp
+    dao/RiskDAO.cpp
     dao/LoanApplicationDAO.cpp
     service/LoanApplicationService.cpp
     service/RiskService.cpp

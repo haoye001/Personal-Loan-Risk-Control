@@ -1,5 +1,6 @@
 {
-    "userId":1,
-    "loanId":2,
-    "amount":10000
+    "userId": 1,
+    "applicationId": 1,
+    "loanId": 2,
+    "amount": 10000
 }
