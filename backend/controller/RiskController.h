@@ -17,11 +17,23 @@ ADD_METHOD_TO(
     "/api/risk/check",
     drogon::Post
 );
+ADD_METHOD_TO(
+    RiskController::getRiskResult,
+    "/api/risk/result/{1}",
+    drogon::Get
+);
 METHOD_LIST_END
 void checkRisk(
     const drogon::HttpRequestPtr& req,
     std::function<void(
         const drogon::HttpResponsePtr&
     )>&& callback
+);
+void getRiskResult(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(
+        const drogon::HttpResponsePtr&
+    )>&& callback,
+    int applicationId
 );
 };

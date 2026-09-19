@@ -72,3 +72,42 @@ void RiskController::checkRisk(
         )
     );
 }
+void RiskController::getRiskResult(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(
+        const drogon::HttpResponsePtr&
+    )>&& callback,
+    int applicationId
+)
+{
+    Json::Value responseJson;
+
+    RiskResult result;
+
+    if (!riskDAO.getRiskResultByApplicationId(
+            applicationId,
+            result))
+    {
+        responseJson["success"] = false;
+        responseJson["message"] = "risk result not found";
+
+        callback(
+            drogon::HttpResponse::newHttpJsonResponse(
+                responseJson
+            )
+        );
+        return;
+    }
+
+    responseJson["success"] = true;
+    responseJson["applicationId"] = result.applicationId;
+    responseJson["score"] = result.score;
+    responseJson["level"] = result.level;
+    responseJson["decision"] = result.decision;
+
+    callback(
+        drogon::HttpResponse::newHttpJsonResponse(
+            responseJson
+        )
+    );
+}

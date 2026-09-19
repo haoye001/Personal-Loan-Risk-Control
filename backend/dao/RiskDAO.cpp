@@ -70,3 +70,55 @@ bool RiskDAO::saveRiskResult(const RiskResult& result)
     mysql_close(conn);
     return true;
 }
+bool RiskDAO::getRiskResultByApplicationId(
+    int applicationId,
+    RiskResult& result
+)
+{
+    MYSQL* conn = connectRiskDatabase();
+    if (conn == nullptr)
+    {
+        return false;
+    }
+    std::string sql =
+        "SELECT application_id, score, level, decision "
+        "FROM risk_result "
+        "WHERE application_id = "
+        + std::to_string(applicationId)
+        + " ORDER BY id DESC LIMIT 1";
+    std::cout << "RISK QUERY SQL: "
+              << sql
+              << std::endl;
+    if (mysql_query(conn, sql.c_str()) != 0)
+    {
+        std::cout << "SELECT risk result failed: "
+                  << mysql_error(conn)
+                  << std::endl;
+        mysql_close(conn);
+        return false;
+    }
+    MYSQL_RES* queryResult = mysql_store_result(conn);
+    if (queryResult == nullptr)
+    {
+        std::cout << "Get risk result failed: "
+                  << mysql_error(conn)
+                  << std::endl;
+
+        mysql_close(conn);
+        return false;
+    }
+    MYSQL_ROW row = mysql_fetch_row(queryResult);
+    if (row == nullptr)
+    {
+        mysql_free_result(queryResult);
+        mysql_close(conn);
+        return false;
+    }
+    result.applicationId = std::stoi(row[0]);
+    result.score = std::stoi(row[1]);
+    result.level = row[2];
+    result.decision = row[3];
+    mysql_free_result(queryResult);
+    mysql_close(conn);
+    return true;
+}
