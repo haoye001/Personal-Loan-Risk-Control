@@ -90,12 +90,14 @@ void RiskController::getRiskResult(
     {
         responseJson["success"] = false;
         responseJson["message"] = "risk result not found";
-
-        callback(
+        auto response=
             drogon::HttpResponse::newHttpJsonResponse(
                 responseJson
-            )
+            );
+        response->setStatusCode(
+            drogon::k404NotFound
         );
+        callback(response);
         return;
     }
 
