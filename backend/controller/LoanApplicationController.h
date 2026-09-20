@@ -18,6 +18,11 @@ ADD_METHOD_TO(
     "/api/applications/{1}",
     drogon::Get
 );
+ADD_METHOD_TO(
+    LoanApplicationController::reviewApplication,
+    "/api/applications/review",
+    drogon::Put
+);
 METHOD_LIST_END
 void applyLoan(
     const drogon::HttpRequestPtr& req,
@@ -31,5 +36,9 @@ void getApplications(
         const drogon::HttpResponsePtr&
     )>&& callback,
     int userId
+);
+void reviewApplication(
+    const drogon::HttpRequestPtr& req,
+    std::function<void(const drogon::HttpResponsePtr&)>&& callback
 );
 };

@@ -7,4 +7,8 @@ class RiskDAO{
         int applicationId,
         RiskResult& result
     );
+    bool updateRiskDecision(
+    int applicationId,
+    const std::string& decision
+    );
 };

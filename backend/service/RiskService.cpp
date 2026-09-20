@@ -24,12 +24,18 @@ RiskResult RiskService::calculateRisk(
     {
         score -= 20;
     }
-    // 贷款金额风险
+
+// 贷款金额风险
+
     if(application.amount > 50000)
+    {
+        score -= 30;
+    }
+    else if(application.amount > 20000)
     {
         score -= 20;
     }
-    else if(application.amount > 10000)
+    else if(application.amount > 5000)
     {
         score -= 10;
     }
@@ -38,13 +44,22 @@ RiskResult RiskService::calculateRisk(
     {
         score += 10;
     }
+    // 限制评分范围
+    if(score > 100)
+    {
+        score = 100;
+    }
+    if(score < 0)
+    {
+        score = 0;
+    }
     result.score = score;
     if(score >= 80)
     {
         result.level = "LOW";
         result.decision = "approved";
     }
-    else if(score >= 60)
+    else if(score >60)
     {
         result.level = "MEDIUM";
         result.decision = "manual_review";

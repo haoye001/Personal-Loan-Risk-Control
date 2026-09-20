@@ -8,4 +8,7 @@ struct LoanApplication
     double amount;
     std::string status;
     std::string createdAt;
+    int riskScore;
+    std::string riskLevel;
+    std::string decision;
 };

@@ -122,3 +122,48 @@ bool RiskDAO::getRiskResultByApplicationId(
     mysql_close(conn);
     return true;
 }
+bool RiskDAO::updateRiskDecision(
+    int applicationId,
+    const std::string& decision
+)
+{
+    MYSQL* conn = mysql_init(nullptr);
+
+    if (conn == nullptr)
+    {
+        return false;
+    }
+
+    if (!mysql_real_connect(
+            conn,
+            "localhost",
+            "root",
+            "061105",
+            "personal_loans",
+            3307,
+            nullptr,
+            0))
+    {
+        mysql_close(conn);
+        return false;
+    }
+
+    std::string sql =
+        "UPDATE risk_result "
+        "SET decision = '" + decision + "' "
+        "WHERE id = ("
+        "SELECT id FROM ("
+        "SELECT id FROM risk_result "
+        "WHERE application_id = " +
+        std::to_string(applicationId) +
+        " ORDER BY id DESC LIMIT 1"
+        ") AS latest"
+        ")";
+
+    bool success =
+        mysql_query(conn, sql.c_str()) == 0;
+
+    mysql_close(conn);
+
+    return success;
+}
