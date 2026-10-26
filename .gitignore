@@ -35,3 +35,19 @@ Thumbs.db
 # Local / AI tool configuration
 # ==============================
 .claude/
+
+# ==============================
+# Android
+# ==============================
+.gradle/
+local.properties
+android-app/app/build/
+android-app/build/
+android-app/.idea/
+android-app/captures/
+android-app/.cxx/
+android-app/.kotlin/
+*.apk
+*.aab
+*.jks
+*.keystore
