@@ -3,6 +3,7 @@
 #include "../controller/UserController.h"
 #include "../controller/LoanController.h"
 #include "../controller/RiskController.h"
+#include "../controller/RepaymentController.h"
 #include <drogon/drogon.h>
 
 int main()

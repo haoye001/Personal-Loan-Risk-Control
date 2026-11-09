@@ -24,6 +24,9 @@
 | 风控 | POST | `/api/risk/check` | 执行风控评估 |
 | 风控 | GET | `/api/risk/result/{applicationId}` | 查询最新风控结果 |
 | 人工审核 | PUT | `/api/applications/review` | 人工审批申请 |
+| 放款 | POST | `/api/applications/{applicationId}/disburse` | 放款并生成还款计划 |
+| 还款计划 | GET | `/api/loans/{applicationId}/repayments` | 查询贷款申请的还款计划 |
+| 还款 | POST | `/api/repayments` | 提交还款 |
 
 ## 3. 用户接口
 
@@ -335,16 +338,90 @@ JSON 格式不合法时为：`{ "success": false, "message": "invalid json" }`�
 
 > 人工审核会同时更新申请表中的 `status` 和该申请最新一条风控结果的 `decision`。应只对 `manual_review` 状态的申请展示审核入口；后端当前未强制校验该前置状态。
 
-## 8. 建议的前端调用流程
+## 8. 还款接口
+
+首次部署还款功能前，在 `personal_loans` 数据库执行
+[`backend/sql/repayment_schema.sql`](backend/sql/repayment_schema.sql) 创建还款计划和还款流水表。
+
+### 8.1 放款并生成还款计划
+
+`POST /api/applications/{applicationId}/disburse`
+
+无需请求体。仅 `approved` 状态的申请可以放款。放款状态更新与还款计划生成在同一数据库事务中完成；
+计划创建失败时，申请不会被置为 `disbursed`。
+
+成功响应（200）：
+
+```json
+{
+  "success": true,
+  "message": "disburse success",
+  "data": { "applicationId": 12, "status": "disbursed" }
+}
+```
+
+### 8.2 查询还款计划
+
+`GET /api/loans/{applicationId}/repayments`
+
+路径参数是**贷款申请 ID**，不是贷款产品 ID。仅在申请放款成功后生成计划。
+首版不计息，贷款本金按贷款产品的 `term`（月数）拆分为等额本金期次，
+每期到期日从放款日期起按月递增。
+
+成功响应（200）：
+
+```json
+{
+  "success": true,
+  "message": "success",
+  "data": {
+    "applicationId": 12,
+    "repayments": [
+      {
+        "id": 1,
+        "applicationId": 12,
+        "installmentNumber": 1,
+        "principalAmount": 100.00,
+        "interestAmount": 0.00,
+        "dueAmount": 100.00,
+        "paidAmount": 0.00,
+        "remainingAmount": 100.00,
+        "dueDate": "2026-12-09",
+        "status": "pending"
+      }
+    ]
+  }
+}
+```
+
+计划不存在时返回 404。
+
+### 8.3 提交还款
+
+`POST /api/repayments`
+
+请求体：
+
+```json
+{ "applicationId": 12, "amount": 100.00 }
+```
+
+`amount` 必须大于零且最多包含两位小数，不得超过剩余应还总额。支持部分还款；
+系统会按期次从早到晚抵扣，并记录每期的实际还款流水。每次还款成功后返回更新后的计划；
+全部结清时申请状态变为 `completed`，否则为 `repaying`。
+
+## 9. 建议的前端调用流程
 
 1. 注册或登录；登录成功后保存业务侧已知的用户 ID。
 2. 调用 `GET /api/loans` 获取产品，并校验申请金额不超过 `maxAmount`。
 3. 调用 `POST /api/apply` 创建申请。
 4. 从 `GET /api/applications/{userId}` 获取最新申请 ID，再调用 `POST /api/risk/check` 进行评估。
 5. 根据 `decision` 展示“通过”“拒绝”或“进入人工审核”。
-6. 对人工审核结果调用 `PUT /api/applications/review`，最后刷新申请列表。
+6. 对需要人工处理的申请调用 `PUT /api/applications/review`，并确认申请已通过。
+7. 对已通过申请调用 `POST /api/applications/{applicationId}/disburse` 放款并生成计划。
+8. 调用 `GET /api/loans/{applicationId}/repayments` 查询计划，再调用 `POST /api/repayments` 还款。
 
-## 9. 前后端联调注意事项
+## 10. 前后端联调注意事项
 
 - `POST /api/apply` 未返回 `applicationId`，因此要执行后续风控只能重新查询申请列表并取目标记录；并发提交时可能取错记录。
 - 登录不返回 `userId`；登录后若前端尚未持有用户 ID，无法可靠进入后续业务流程。

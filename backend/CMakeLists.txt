@@ -45,12 +45,15 @@ add_executable(
     controller/LoanController.cpp
     controller/LoanApplicationController.cpp
     controller/RiskController.cpp
+    controller/RepaymentController.cpp
     service/LoanService.cpp
     dao/LoanDAO.cpp
     dao/RiskDAO.cpp
     dao/LoanApplicationDAO.cpp
     service/LoanApplicationService.cpp
     service/RiskService.cpp
+    dao/RepaymentDAO.cpp
+    service/RepaymentService.cpp
 )
 
 # ==============================
