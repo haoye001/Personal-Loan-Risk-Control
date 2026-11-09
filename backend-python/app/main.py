@@ -1,17 +1,41 @@
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
-from app.routers import auth
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-app = FastAPI(
-    title="个人贷款风控系统 API",
-    version="0.1.0",
-    description="第一阶段：服务骨架与用户注册请求校验。",
+from app.core import CORS_ORIGINS, validate_settings
+from app.routers import auth, loans, repayments
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    validate_settings()
+    yield
+
+
+app = FastAPI(title="个人贷款风控系统 API", version="1.0.0", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_methods=["GET", "POST", "PUT"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+app.include_router(auth.router, prefix="/api")
+app.include_router(loans.router, prefix="/api")
+app.include_router(loans.admin_router, prefix="/api")
+app.include_router(repayments.router, prefix="/api")
 
-app.include_router(auth.router, prefix="/api", tags=["认证"])
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"detail": [{key: error[key] for key in ("loc", "msg", "type")} for error in exc.errors()]},
+    )
 
 
 @app.get("/health", tags=["系统"])
 def health_check() -> dict[str, str]:
-    """供部署检查和联调确认服务是否正常运行。"""
     return {"status": "ok"}

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import AfterValidator, BaseModel, Field, field_validator
 
 Username = Annotated[
     str,
@@ -11,9 +11,16 @@ Username = Annotated[
         description="3 至 32 位，仅允许字母、数字和下划线。",
     ),
 ]
+def validate_password_bytes(value: str) -> str:
+    if len(value.encode()) > 72:
+        raise ValueError("password must be at most 72 UTF-8 bytes")
+    return value
+
+
 Password = Annotated[
     str,
-    Field(min_length=8, max_length=72, description="8 至 72 位密码。"),
+    Field(min_length=8, max_length=72, description="至少 8 字符，最多 72 UTF-8 字节。"),
+    AfterValidator(validate_password_bytes),
 ]
 Phone = Annotated[
     str,
@@ -38,3 +45,13 @@ class RegisterResponse(BaseModel):
     success: bool
     message: str
     username: str
+
+
+class LoginRequest(BaseModel):
+    username: Username
+    password: Password
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

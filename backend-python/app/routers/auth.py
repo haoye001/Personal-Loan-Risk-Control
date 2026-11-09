@@ -1,20 +1,38 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
-from app.schemas.auth import RegisterRequest, RegisterResponse
+from app.core import create_token, hash_password, verify_password
+from app.dependencies import Db
+from app.models import User
+from app.repositories import audit, find_user
+from app.schemas.auth import LoginRequest, LoginResponse, RegisterRequest, RegisterResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["认证"])
+DUMMY_HASH = hash_password("unused-placeholder")
 
 
-@router.post(
-    "/auth/register",
-    response_model=RegisterResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="校验注册请求",
-)
-def register(payload: RegisterRequest) -> RegisterResponse:
-    """第一阶段仅校验请求；第二阶段改为密码哈希后写入 MySQL。"""
-    return RegisterResponse(
-        success=True,
-        message="registration request is valid; database persistence is not enabled yet",
-        username=payload.username,
-    )
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+def register(payload: RegisterRequest, db: Db) -> RegisterResponse:
+    user = User(username=payload.username.lower(), password_hash=hash_password(payload.password), phone=payload.phone)
+    db.add(user)
+    try:
+        db.flush()
+        audit(db, user.id, "register")
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        if find_user(db, payload.username) is not None:
+            raise HTTPException(409, "Username already exists") from None
+        raise
+    return RegisterResponse(success=True, message="registration successful", username=user.username)
+
+
+@router.post("/login")
+def login(payload: LoginRequest, db: Db) -> LoginResponse:
+    user = find_user(db, payload.username)
+    valid = verify_password(payload.password, user.password_hash if user else DUMMY_HASH)
+    if user is None or not valid:
+        raise HTTPException(401, "Invalid username or password")
+    audit(db, user.id, "login")
+    db.commit()
+    return LoginResponse(access_token=create_token(user.id))
