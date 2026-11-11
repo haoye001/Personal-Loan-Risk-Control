@@ -40,13 +40,26 @@ runuser -u loan-risk --preserve-environment -- .venv/bin/python -m app.manage cr
 unset DATABASE_URL JWT_SECRET
 ```
 
-服务使用 SSH 隧道访问。用有权访问服务器的 SSH 账号执行：
+浏览器可以直接打开 [公网管理端](https://120.55.39.172/) 和 [FastAPI 文档](https://120.55.39.172/docs)。Nginx 提供 HTTPS，证书通过 systemd 定时续期。
+
+服务器目录如下：
+
+| 路径 | 用途 |
+| --- | --- |
+| `/opt/personal-loan-risk-control/current/backend/` | FastAPI、Alembic 和 Python 虚拟环境 |
+| `/opt/personal-loan-risk-control/current/web/` | Vue 管理端构建文件 |
+| `/opt/personal-loan-risk-control/releases/` | 部署版本，`current` 指向运行版本 |
+| `/etc/personal-loan-risk-control/` | 后端和 MySQL 环境配置 |
+| `/etc/nginx/conf.d/personal-loan-public.conf` | 公网 HTTPS 站点和 API 代理 |
+| `/var/lib/docker/volumes/loan-risk-mysql-data/_data/` | MySQL 数据卷 |
+
+此前生成的 Android 联调包默认连接 `127.0.0.1:18080`。继续使用这个 APK 时，先打开 SSH 隧道：
 
 ```powershell
 ssh -N -L 18080:127.0.0.1:18080 YOUR_USER@YOUR_SERVER
 ```
 
-保持隧道打开，在浏览器访问 [管理端](http://127.0.0.1:18080/) 和 [FastAPI 文档](http://127.0.0.1:18080/docs)。使用上述默认工作流生成的 APK 时，在同一台电脑连接 Android 设备并开启 USB 调试，然后执行：
+保持隧道打开，在同一台电脑连接 Android 设备并开启 USB 调试，然后执行：
 
 ```powershell
 adb reverse tcp:18080 tcp:18080
