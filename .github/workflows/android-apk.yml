@@ -32,7 +32,7 @@ jobs:
           java-version: '25'
       - uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-37'
+          packages: 'platform-tools platforms;android-36'
       - name: Assemble debug APK
         env:
           LOAN_API_URL: ${{ inputs.api_url || 'http://127.0.0.1:18080' }}

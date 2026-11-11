@@ -19,7 +19,7 @@ Python 方案支持借款人注册、登录、补充资料、提交贷款申请�
 
 打开 GitHub 的 [Android APK 工作流](https://github.com/hyG0611/Personal-Loan-Risk-Control/actions/workflows/android-apk.yml)，在成功运行的 **Artifacts** 区下载 `loan-android-debug`，解压后安装 `app-debug.apk`。这是使用调试签名的联调包。可用 **Run workflow** 指定其他后端地址重新打包。
 
-也可以在 Android Studio 中安装项目要求的 Android SDK Platform 37 和 JDK 25，然后从 `python-solution/android-app` 执行：
+也可以在 Android Studio 中安装项目要求的 Android SDK Platform 36 和 JDK 25，然后从 `python-solution/android-app` 执行：
 
 ```powershell
 .\gradlew.bat :app:assembleDebug -PloanApiUrl=http://127.0.0.1:18080

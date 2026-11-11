@@ -4,9 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.loanapp"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 36
 
     val apiUrl = providers.gradleProperty("loanApiUrl").orElse("http://10.0.2.2:8000").get()
     require(Regex("https?://[A-Za-z0-9.:-]+/?").matches(apiUrl)) {
@@ -20,7 +18,7 @@ android {
         buildConfigField("String", "LOAN_API_URL", "\"$apiUrl\"")
         applicationId = "com.example.loanapp"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
