@@ -41,12 +41,11 @@ Thumbs.db
 # ==============================
 .gradle/
 local.properties
-android-app/app/build/
-android-app/build/
-android-app/.idea/
-android-app/captures/
-android-app/.cxx/
-android-app/.kotlin/
+**/build/
+**/.idea/
+**/captures/
+**/.cxx/
+**/.kotlin/
 *.apk
 *.aab
 *.jks
