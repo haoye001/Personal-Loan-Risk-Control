@@ -11,6 +11,14 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LoanApi.init(this)
+        // 已保存登录态则直接进入首页，免重复登录
+        if (LoanApi.token != null) {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_main)
         val login = findViewById<Button>(R.id.button)
         val register = findViewById<Button>(R.id.buttonRegister)
@@ -34,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 login.isEnabled = true
                 register.isEnabled = true
             }) { token ->
-                LoanApi.token = token
+                LoanApi.saveToken(token)
                 startActivity(Intent(this, HomeActivity::class.java))
                 finish()
             }

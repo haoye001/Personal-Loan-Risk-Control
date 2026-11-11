@@ -1,6 +1,8 @@
 package com.example.loanapp
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.MediaType.Companion.toMediaType
@@ -11,9 +13,29 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 internal object LoanApi {
+    private const val PREFS_NAME = "loan_prefs"
+    private const val KEY_TOKEN = "access_token"
+
     private val client = OkHttpClient()
     private val json = "application/json".toMediaType()
+    private lateinit var prefs: SharedPreferences
+
     @Volatile var token: String? = null
+
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        token = prefs.getString(KEY_TOKEN, null)
+    }
+
+    fun saveToken(value: String) {
+        token = value
+        prefs.edit().putString(KEY_TOKEN, value).apply()
+    }
+
+    fun clearToken() {
+        token = null
+        if (::prefs.isInitialized) prefs.edit().remove(KEY_TOKEN).apply()
+    }
 
     class Failure(val status: Int, message: String) : Exception(message)
 
@@ -56,7 +78,7 @@ internal fun AppCompatActivity.showMessage(message: String) {
 }
 
 internal fun AppCompatActivity.returnToLogin() {
-    LoanApi.token = null
+    LoanApi.clearToken()
     startActivity(Intent(this, MainActivity::class.java).apply {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     })

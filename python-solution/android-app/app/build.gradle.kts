@@ -6,7 +6,7 @@ android {
     namespace = "com.example.loanapp"
     compileSdk = 36
 
-    val apiUrl = providers.gradleProperty("loanApiUrl").orElse("http://10.0.2.2:8000").get()
+    val apiUrl = providers.gradleProperty("loanApiUrl").orElse("https://120.55.39.172").get()
     require(Regex("https?://[A-Za-z0-9.:-]+/?").matches(apiUrl)) {
         "loanApiUrl must be an HTTP(S) server origin"
     }

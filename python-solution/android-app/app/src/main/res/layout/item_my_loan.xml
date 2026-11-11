@@ -37,4 +37,13 @@
         android:textColor="#666666"
         android:textSize="14sp" />
 
+    <TextView
+        android:id="@+id/textRisk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:textColor="#666666"
+        android:textSize="14sp" />
+
 </LinearLayout>

@@ -12,6 +12,7 @@ class MyLoanAdapter(private val loans: List<MyLoan>) : RecyclerView.Adapter<MyLo
         val textProductName: TextView = itemView.findViewById(R.id.textProductName)
         val textStatus: TextView = itemView.findViewById(R.id.textStatus)
         val textDetail: TextView = itemView.findViewById(R.id.textDetail)
+        val textRisk: TextView = itemView.findViewById(R.id.textRisk)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoanViewHolder {
@@ -25,6 +26,18 @@ class MyLoanAdapter(private val loans: List<MyLoan>) : RecyclerView.Adapter<MyLo
         holder.textProductName.text = loan.productName
         holder.textStatus.text = loan.status
         holder.textDetail.text = "金额 ${loan.amount} 元"
+
+        val levelText = riskLevelText(loan.level)
+        if (loan.score != null) {
+            holder.textRisk.visibility = View.VISIBLE
+            holder.textRisk.text = if (levelText.isEmpty()) {
+                "风控评分 ${loan.score}"
+            } else {
+                "风控评分 ${loan.score} · $levelText"
+            }
+        } else {
+            holder.textRisk.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = loans.size

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
+import org.json.JSONObject
 
 class MyLoansActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +22,19 @@ class MyLoansActivity : AppCompatActivity() {
             List(applications.length()) { index ->
                 val application = applications.getJSONObject(index)
                 val loanId = application.getInt("loanId")
-                MyLoan(products[loanId]?.name ?: "产品 #$loanId", application.getString("amount"),
-                    applicationStatus(application.getString("status")))
+                val applicationId = application.getInt("applicationId")
+                // 风控结果可能尚未生成（如仍在等待风控），取不到就留空
+                val risk = runCatching {
+                    val json = JSONObject(LoanApi.request("/applications/$applicationId/risk-result"))
+                    json.getInt("score") to json.getString("level")
+                }.getOrNull()
+                MyLoan(
+                    productName = products[loanId]?.name ?: "产品 #$loanId",
+                    amount = application.getString("amount"),
+                    status = applicationStatus(application.getString("status")),
+                    score = risk?.first,
+                    level = risk?.second,
+                )
             }
         }) { loans ->
             list.adapter = MyLoanAdapter(loans)
