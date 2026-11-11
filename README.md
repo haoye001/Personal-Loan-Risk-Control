@@ -7,7 +7,7 @@
 | [python-solution](python-solution) | FastAPI 后端、Vue 管理端、Android 借款端和成员 SQL 示例 |
 | [cpp-solution](cpp-solution) | C++ 后端、客户端副本、接口文档和设计资料 |
 
-Python 方案支持借款人注册、登录、补充资料、提交贷款申请和查询结果。规则风控会决定是否转入人工审核。管理员可以审批申请、管理成员档案。默认使用 SQLite，数据库结构由 Alembic 管理。
+Python 方案支持借款人注册、登录、补充资料、提交贷款申请和查询结果。规则风控会决定是否转入人工审核。管理员可以审批申请、管理成员档案。本地联调默认使用 SQLite，服务器使用 MySQL。两种环境都通过 Alembic 管理表结构。
 
 ## 本地联调
 
@@ -28,6 +28,17 @@ Python 方案支持借款人注册、登录、补充资料、提交贷款申请�
 生成文件位于 `app/build/outputs/apk/debug/app-debug.apk`。
 
 ## 服务器访问
+
+服务器通过 Nginx 提供管理端和 API。后端连接服务器上的 MySQL，数据库账号和 JWT 密钥由服务器保管。首次登录管理端前，在服务器上以管理员权限创建应用账号：
+
+```bash
+cd /opt/personal-loan-risk-control/current/backend
+set -a
+. /etc/personal-loan-risk-control/app.env
+set +a
+runuser -u loan-risk --preserve-environment -- .venv/bin/python -m app.manage create-admin YOUR_ADMIN YOUR_PHONE
+unset DATABASE_URL JWT_SECRET
+```
 
 服务使用 SSH 隧道访问。用有权访问服务器的 SSH 账号执行：
 
