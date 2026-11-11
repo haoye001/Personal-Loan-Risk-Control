@@ -8,7 +8,7 @@ on:
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
     inputs:
-      api_url:
+      api_url:https://120.55.39.172
         description: Backend origin accessible from the Android device
         default: http://127.0.0.1:18080
         type: string
