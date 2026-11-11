@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="个人资料" android:textSize="24sp" />
+        <EditText android:id="@+id/editProfilePhone" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="手机号" android:inputType="phone" />
+        <EditText android:id="@+id/editProfileAge" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="年龄" android:inputType="number" />
+        <EditText android:id="@+id/editProfileIncome" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="月收入（元）" android:inputType="numberDecimal" />
+        <EditText android:id="@+id/editProfileDebt" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="负债（元）" android:inputType="numberDecimal" />
+        <EditText android:id="@+id/editProfileOccupation" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="职业（选填）" android:inputType="text" />
+        <Button android:id="@+id/buttonSaveProfile" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="保存资料" />
+        <Button android:id="@+id/buttonLogout" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="退出登录" />
+    </LinearLayout>
+</ScrollView>
