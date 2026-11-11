@@ -34,6 +34,7 @@ async function signIn() {
   <template v-else>
     <nav aria-label="管理导航">
       <RouterLink to="/">贷款审批</RouterLink>
+      <RouterLink to="/borrowers">借款用户</RouterLink>
       <RouterLink to="/member">成员管理</RouterLink>
       <button type="button" @click="logout">退出登录</button>
     </nav>

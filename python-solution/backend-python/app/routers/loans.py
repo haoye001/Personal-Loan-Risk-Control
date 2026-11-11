@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.dependencies import Admin, CurrentUser, Db
@@ -17,6 +18,11 @@ from app.services import calculate_risk
 
 router = APIRouter(tags=["借款业务"])
 admin_router = APIRouter(prefix="/admin", tags=["管理员"])
+
+
+class BorrowerSummary(BaseModel):
+    id: int
+    username: str
 
 
 def application_response(application: LoanApplication) -> ApplicationResponse:
@@ -125,6 +131,12 @@ def evaluate_risk(application_id: int, user: CurrentUser, db: Db) -> RiskRespons
     audit(db, user.id, "evaluate_risk", application_id)
     db.commit()
     return risk_response(result)
+
+
+@admin_router.get("/borrowers")
+def list_borrowers(admin: Admin, db: Db) -> list[BorrowerSummary]:
+    rows = db.execute(select(User.id, User.username).where(User.role == "borrower").order_by(User.id.desc()))
+    return [BorrowerSummary(id=row.id, username=row.username) for row in rows]
 
 
 @admin_router.get("/applications")

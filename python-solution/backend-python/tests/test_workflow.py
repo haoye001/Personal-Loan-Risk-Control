@@ -55,6 +55,17 @@ def borrower(client, username, income=5000, debt=0):
     return headers
 
 
+def test_admin_can_see_registered_borrowers(client):
+    customer = borrower(client, "sjx")
+    admin = login(client, "admin", "Admin1234")
+    url = "/api/admin/borrowers"
+    assert client.get(url).status_code == 401
+    assert client.get(url, headers=customer).status_code == 403
+    response = client.get(url, headers=admin)
+    assert response.status_code == 200
+    assert response.json() == [{"id": 2, "username": "sjx"}]
+
+
 def test_authentication_and_validation(client):
     assert client.get("/health").json() == {"status": "ok"}
     assert client.get("/openapi.json").status_code == 200
