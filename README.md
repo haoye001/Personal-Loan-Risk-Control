@@ -17,12 +17,12 @@ Python 方案支持借款人注册、登录、补充资料、提交贷款申请�
 
 ## Android 安装包
 
-打开 GitHub 的 [Android APK 工作流](https://github.com/hyG0611/Personal-Loan-Risk-Control/actions/workflows/android-apk.yml)，在成功运行的 **Artifacts** 区下载 `loan-android-debug`，解压后安装 `app-debug.apk`。这是使用调试签名的联调包。可用 **Run workflow** 指定其他后端地址重新打包。
+打开 GitHub 的 [Android APK 工作流](https://github.com/hyG0611/Personal-Loan-Risk-Control/actions/workflows/android-apk.yml)，在成功运行的 **Artifacts** 区下载 `loan-android-debug`，解压后安装 `app-debug.apk`。这是使用调试签名的联调包，默认连接 `https://120.55.39.172`。下载并安装后，手机可直接通过公网使用。可用 **Run workflow** 指定其他后端地址重新打包。
 
 也可以在 Android Studio 中安装项目要求的 Android SDK Platform 36 和 JDK 25，然后从 `python-solution/android-app` 执行：
 
 ```powershell
-.\gradlew.bat :app:assembleDebug -PloanApiUrl=http://127.0.0.1:18080
+.\gradlew.bat :app:assembleDebug -PloanApiUrl=https://120.55.39.172
 ```
 
 生成文件位于 `app/build/outputs/apk/debug/app-debug.apk`。
@@ -53,17 +53,6 @@ unset DATABASE_URL JWT_SECRET
 | `/etc/nginx/conf.d/personal-loan-public.conf` | 公网 HTTPS 站点和 API 代理 |
 | `/var/lib/docker/volumes/loan-risk-mysql-data/_data/` | MySQL 数据卷 |
 
-此前生成的 Android 联调包默认连接 `127.0.0.1:18080`。继续使用这个 APK 时，先打开 SSH 隧道：
-
-```powershell
-ssh -N -L 18080:127.0.0.1:18080 YOUR_USER@YOUR_SERVER
-```
-
-保持隧道打开，在同一台电脑连接 Android 设备并开启 USB 调试，然后执行：
-
-```powershell
-adb reverse tcp:18080 tcp:18080
-adb install -r app-debug.apk
-```
+旧版隧道 APK 的服务器地址在构建时写入。请使用公网地址重新构建的 APK。
 
 `sql/sq1/member.sql` 是独立的 MySQL 示例。Python 管理端的成员档案保存在 Alembic 创建的 `members` 表，管理员权限来自 `users.role`。

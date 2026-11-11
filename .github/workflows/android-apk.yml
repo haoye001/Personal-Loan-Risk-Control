@@ -8,9 +8,9 @@ on:
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
     inputs:
-      api_url:https://120.55.39.172
+      api_url:
         description: Backend origin accessible from the Android device
-        default: http://127.0.0.1:18080
+        default: https://120.55.39.172
         type: string
         required: true
 
@@ -35,7 +35,7 @@ jobs:
           packages: 'platform-tools platforms;android-36'
       - name: Assemble debug APK
         env:
-          LOAN_API_URL: ${{ inputs.api_url || 'http://127.0.0.1:18080' }}
+          LOAN_API_URL: ${{ inputs.api_url || 'https://120.55.39.172' }}
         run: bash gradlew :app:assembleDebug "-PloanApiUrl=$LOAN_API_URL" --no-daemon
       - uses: actions/upload-artifact@v4
         with:
